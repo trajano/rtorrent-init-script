@@ -1,6 +1,6 @@
 #!/bin/bash
 # /etc/init.d/bittorrent
-# version 2012-07-17 (YYYY-MM-DD)
+# version 2012-11-30 (YYYY-MM-DD)
  
 ### BEGIN INIT INFO
 # Provides: bittorrent
@@ -34,8 +34,9 @@
 . /etc/rc.d/init.d/functions
 
 ## Settings
-# Username of non-root user who will run the server
-USERNAME="username"
+# Username of non-root user who will run the server, this user
+# must have access to the rtorrent in its path.
+USERNAME="rtorrent"
 # Nice looking name of service for script to report back to users
 SERVERNAME="rTorrent"
 # Filename of server binary
@@ -127,7 +128,7 @@ do_start() {
     # -c /dev/null  : run screen with no config file, the user could already have one which breaks things
     # -fn           : turn flow-control off so ctrl+q works to quit
     # -dmS          : start a detatched screen called $SCRNAME with $SERVICE $OPTIONS inside it
-    as_user "cd ${BASEPATH} && screen -c /dev/null -fn -dmS ${SCRNAME} ${SERVICE} ${OPTIONS} 2>&1 1>/dev/null"
+    screen -c /dev/null -fn -dmS ${SCRNAME} su ${USERNAME} -c ${SERVICE} ${OPTIONS}
 
     echo "* Checking ${SERVERNAME} is running..."
     sleep 2;
@@ -194,7 +195,7 @@ do_info() {
 do_connect() {
   check_running;
 
-  as_user "screen -dr ${SCRNAME}"
+  screen -dr ${SCRNAME}
 }
 
 
